@@ -2,6 +2,7 @@ package com.nusiss.orderservice.mapper;
 
 import com.nusiss.orderservice.domain.OrderItem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author jyc
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-10-11 00:54:50
 * @Entity generator.domain.OrderItem
 */
+
 public interface OrderItemMapper extends BaseMapper<OrderItem> {
 
 }

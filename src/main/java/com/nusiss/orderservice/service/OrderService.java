@@ -2,6 +2,9 @@ package com.nusiss.orderservice.service;
 
 import com.nusiss.orderservice.domain.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.nusiss.orderservice.param.SubmitOrderParam;
+
+import java.util.List;
 
 /**
 * @author jyc
@@ -10,4 +13,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface OrderService extends IService<Order> {
 
+    int addOrder(Order order);
+
+    List<Order> getOrderByUserId(long l);
+
+    Long submitOrder(SubmitOrderParam submitOrderParam);
+
+    void paySuccess(Long orderId);
 }
