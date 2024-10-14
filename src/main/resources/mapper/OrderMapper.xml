@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nusiss.orderservice.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.nusiss.orderservice.domain.Order">
+            <id property="orderId" column="order_id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="orderDate" column="order_date" jdbcType="TIMESTAMP"/>
+            <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+            <result property="status" column="status" jdbcType="OTHER"/>
+            <result property="createUser" column="create_user" jdbcType="VARCHAR"/>
+            <result property="updateUser" column="update_user" jdbcType="VARCHAR"/>
+            <result property="createDatetime" column="create_datetime" jdbcType="TIMESTAMP"/>
+            <result property="updateDatetime" column="update_datetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id,user_id,order_date,
+        total_price,status,create_user,
+        update_user,create_datetime,update_datetime
+    </sql>
+</mapper>
