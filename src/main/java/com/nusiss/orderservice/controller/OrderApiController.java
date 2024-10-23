@@ -24,5 +24,4 @@ public class OrderApiController {
         orderService.paySuccess(orderId);
         return ApiResponse.success();
     }
-
 }

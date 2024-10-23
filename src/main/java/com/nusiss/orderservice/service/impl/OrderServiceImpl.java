@@ -15,6 +15,7 @@ import com.nusiss.orderservice.service.OrderService;
 import com.nusiss.orderservice.mapper.OrderMapper;
 import feign.QueryMap;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,6 +31,7 @@ import java.util.List;
 * @createDate 2024-10-11 00:45:49
 */
 @Service
+@Slf4j
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     implements OrderService{
 
@@ -88,16 +90,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     }
 
     @RabbitListener(queues = RabbitConfig.CONFIRM_QUEUE)
-    public void handleConfirmMessage(Order order) {
+    public void handleConfirmMessage(InventoryMessage inventoryMessage) {
         // 确认订单
-        orderMapper.update(null,new UpdateWrapper<Order>().eq("order_id", order.getOrderId()).set("status","PAID"));
+        System.out.println("收到确认消息");
+        // 修改订单状态为已支付
+        orderMapper.update(null,new UpdateWrapper<Order>().eq("order_id", inventoryMessage.getOrderId()).set("status","PAID"));
     }
 
     @RabbitListener(queues = RabbitConfig.ROLLBACK_QUEUE)
-    public void handleRollbackMessage(Order order) {
+    public void handleRollbackMessage(InventoryMessage inventoryMessage) {
         // 回滚订单
-        orderItemMapper.delete(new QueryWrapper<OrderItem>().eq("order_id", order.getOrderId()));
-        orderMapper.delete(new QueryWrapper<Order>().eq("order_id", order.getOrderId()));
+        System.out.println("收到回滚消息");
+        orderItemMapper.delete(new QueryWrapper<OrderItem>().eq("order_id", inventoryMessage.getOrderId()));
+        orderMapper.delete(new QueryWrapper<Order>().eq("order_id", inventoryMessage.getOrderId()));
     }
 
     @Override
@@ -116,11 +121,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
         for (OrderItem orderItem : orderItemList) {
             List<Object> itemList = new ArrayList<>();
-            InventoryMessage inventoryMessage = new InventoryMessage(orderItem.getProductId(),orderItem.getQuantity());
-            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "inventory.decrement", inventoryMessage);
+            InventoryMessage inventoryMessage = new InventoryMessage(orderItem.getProductId(),orderItem.getQuantity(),orderId);
+            // rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "inventory.decrement", inventoryMessage);
+            try {
+                rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "inventory.decrement", inventoryMessage);
+            } catch (Exception e) {
+                log.error("消息发送失败", e);
+            }
             System.out.println("发送消息");
+            log.info("发送消息日志");
         }
-        Order order = orderMapper.selectById(orderId);
     }
 }
 
