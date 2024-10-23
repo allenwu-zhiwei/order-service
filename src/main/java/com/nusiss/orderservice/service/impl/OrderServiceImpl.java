@@ -9,6 +9,7 @@ import com.nusiss.orderservice.domain.Order;
 import com.nusiss.orderservice.domain.OrderItem;
 import com.nusiss.orderservice.dto.CartInfoDTO;
 import com.nusiss.orderservice.mapper.OrderItemMapper;
+import com.nusiss.orderservice.mq.InventoryMessage;
 import com.nusiss.orderservice.param.SubmitOrderParam;
 import com.nusiss.orderservice.service.OrderService;
 import com.nusiss.orderservice.mapper.OrderMapper;
@@ -115,9 +116,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
         for (OrderItem orderItem : orderItemList) {
             List<Object> itemList = new ArrayList<>();
-            itemList.add(orderItem.getProductId());
-            itemList.add(orderItem.getQuantity());
-            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "order.created",itemList);
+            InventoryMessage inventoryMessage = new InventoryMessage(orderItem.getProductId(),orderItem.getQuantity());
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "inventory.decrement", inventoryMessage);
             System.out.println("发送消息");
         }
         Order order = orderMapper.selectById(orderId);
