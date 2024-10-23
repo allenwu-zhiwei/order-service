@@ -100,6 +100,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.nusiss</groupId>
+			<artifactId>commonservice</artifactId> <!-- Make sure the artifactId matches -->
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

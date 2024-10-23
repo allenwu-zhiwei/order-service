@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,9 +112,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         //     inventoryApiClient.deductStock(orderItem.getProductId(),orderItem.getQuantity());
         // }
         // 发送消息到RabbitMQ
-        // 查询订单信息
+        List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
+        for (OrderItem orderItem : orderItemList) {
+            List<Object> itemList = new ArrayList<>();
+            itemList.add(orderItem.getProductId());
+            itemList.add(orderItem.getQuantity());
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "order.created",itemList);
+        }
         Order order = orderMapper.selectById(orderId);
-        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "order.created", order);
     }
 }
 

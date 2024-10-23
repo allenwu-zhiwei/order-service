@@ -12,8 +12,6 @@ import java.util.Date;
  */
 @Data
 public class CartInfoDTO {
-    //用户id
-    private String userId;
 
     //商品id
     private Long productId;
@@ -21,14 +19,8 @@ public class CartInfoDTO {
     //数量
     private Integer quantity;
 
-    //图片文件
-    private String imgUrl;
-
-    //商品名称
-    private String productName;
-
     //是否选中
-    private Integer isChecked = 1;
+    private Integer isSelected;
 
     //价格(单价)
     private BigDecimal price;
