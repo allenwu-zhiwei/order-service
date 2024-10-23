@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient("inventory-service")
 public interface InventoryApiClient {
     //检查是否有库存
-    @GetMapping("/inventory/inner/checkStock/{productId}/{num}")
+    @GetMapping("/inventory/check/{productId}/{num}")
     public Boolean checkStock(@PathVariable("productId") Long productId, @PathVariable("num") Integer num);
 
-    //扣减库存
-    @GetMapping("/inventory/inner/deductStock/{productId}/{num}")
-    public Boolean deductStock(@PathVariable("productId") Long productId, @PathVariable("num") Integer num);
+    // //扣减库存
+    // @GetMapping("/inventory/inner/deductStock/{productId}/{num}")
+    // public Boolean deductStock(@PathVariable("productId") Long productId, @PathVariable("num") Integer num);
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nusiss.orderservice.client.InventoryApiClient;
+import com.nusiss.orderservice.config.RabbitConfig;
 import com.nusiss.orderservice.domain.Order;
 import com.nusiss.orderservice.domain.OrderItem;
 import com.nusiss.orderservice.dto.CartInfoDTO;
@@ -14,6 +15,8 @@ import com.nusiss.orderservice.mapper.OrderMapper;
 import feign.QueryMap;
 import jakarta.annotation.Resource;
 import lombok.val;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -34,6 +37,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     private OrderItemMapper orderItemMapper;
     @Resource
     private InventoryApiClient inventoryApiClient;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public int addOrder(Order order) {
@@ -80,18 +85,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         return order.getOrderId();
     }
 
+    @RabbitListener(queues = RabbitConfig.CONFIRM_QUEUE)
+    public void handleConfirmMessage(Order order) {
+        // 确认订单
+        orderMapper.update(null,new UpdateWrapper<Order>().eq("order_id", order.getOrderId()).set("status","PAID"));
+    }
+
+    @RabbitListener(queues = RabbitConfig.ROLLBACK_QUEUE)
+    public void handleRollbackMessage(Order order) {
+        // 回滚订单
+        orderItemMapper.delete(new QueryWrapper<OrderItem>().eq("order_id", order.getOrderId()));
+        orderMapper.delete(new QueryWrapper<Order>().eq("order_id", order.getOrderId()));
+    }
+
     @Override
     public void paySuccess(Long orderId) {
-        // 修改ID为orderId的订单状态为已支付
-        UpdateWrapper<Order> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("order_id",orderId);
-        updateWrapper.set("status","PAID");
-        orderMapper.update(null,updateWrapper);
-        // 扣减库存
-        List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
-        for (OrderItem orderItem : orderItemList) {
-            inventoryApiClient.deductStock(orderItem.getProductId(),orderItem.getQuantity());
-        }
+        // // 修改ID为orderId的订单状态为已支付
+        // UpdateWrapper<Order> updateWrapper = new UpdateWrapper<>();
+        // updateWrapper.eq("order_id",orderId);
+        // updateWrapper.set("status","PAID");
+        // orderMapper.update(null,updateWrapper);
+        // // 扣减库存
+        // List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
+        // for (OrderItem orderItem : orderItemList) {
+        //     inventoryApiClient.deductStock(orderItem.getProductId(),orderItem.getQuantity());
+        // }
+        // 发送消息到RabbitMQ
+        // 查询订单信息
+        Order order = orderMapper.selectById(orderId);
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "order.created", order);
     }
 }
 
