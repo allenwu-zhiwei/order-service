@@ -4,6 +4,7 @@ import com.nusiss.orderservice.client.InventoryApiClient;
 import com.nusiss.orderservice.config.ApiResponse;
 import com.nusiss.orderservice.service.OrderService;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class OrderApiController {
     private OrderService orderService;
 
     // 支付成功回调
-    @RequestMapping("/paySuccess")
+    @GetMapping("/paySuccess")
     public ApiResponse paySuccess(Long orderId) {
         orderService.paySuccess(orderId);
         return ApiResponse.success();

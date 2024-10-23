@@ -118,6 +118,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             itemList.add(orderItem.getProductId());
             itemList.add(orderItem.getQuantity());
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "order.created",itemList);
+            System.out.println("发送消息");
         }
         Order order = orderMapper.selectById(orderId);
     }
