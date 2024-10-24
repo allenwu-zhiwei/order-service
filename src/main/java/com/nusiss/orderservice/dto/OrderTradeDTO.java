@@ -16,5 +16,4 @@ public class OrderTradeDTO {
     private Date OrderDate;
     private BigDecimal totalPrice;
     private List<CartInfoDTO> cartInfoList;
-    private List<UserAddressDTO> userAddress;
 }
