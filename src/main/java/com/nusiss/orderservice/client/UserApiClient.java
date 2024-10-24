@@ -2,7 +2,7 @@ package com.nusiss.orderservice.client;
 
 import com.nusiss.commonservice.entity.User;
 import com.nusiss.orderservice.config.ApiResponse;
-import com.nusiss.orderservice.dto.UserAddressDTO;
+import org.springframework.amqp.core.Address;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ public interface UserApiClient {
     // @GetMapping("/user/inner/getUserAddress/{userId}")
     // public List<UserAddressDTO> getUserAddress(@PathVariable("userId") Long userId);
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<UserAddressDTO>> getAddressesByUserId(@PathVariable("userId") Integer userId);
+    public ResponseEntity<List<Address>> getAddressesByUserId(@PathVariable("userId") Integer userId);
 
     // 获取当前用户信息
     @PostMapping("/getCurrentUserInfo")

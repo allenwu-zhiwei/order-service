@@ -1,33 +1,32 @@
 package com.nusiss.orderservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Author jyc
- * @Date 2024/10/12 下午10:13
+ * @Date 2024/10/24 下午5:36
  */
+
 @Data
 public class CartInfoDTO {
 
-    //商品id
+    private Long cartItemId;
+
     private Long productId;
 
-    //数量
-    private Integer quantity;
+    private String productName;
 
-    //是否选中
-    private Integer isSelected;
+    private int quantity;
 
-    //价格(单价)
-    private BigDecimal price;
+    private double price;
 
-    //创建时间
-    private Date createTime;
+    private LocalDateTime createDatetime = LocalDateTime.now();
 
-    //更新时间
-    private Date updateTime;
+    private LocalDateTime updateDatetime = LocalDateTime.now();
+
+    private String createUser;
+
+    private String updateUser;
 }

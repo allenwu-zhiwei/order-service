@@ -100,6 +100,16 @@
 			<artifactId>commonservice</artifactId> <!-- Make sure the artifactId matches -->
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.nusiss</groupId>
+			<artifactId>user-service</artifactId> <!-- Make sure the artifactId matches -->
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nusiss</groupId>
+			<artifactId>shoppingcart-service</artifactId> <!-- Make sure the artifactId matches -->
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

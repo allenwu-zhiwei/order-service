@@ -13,14 +13,14 @@ import com.nusiss.orderservice.mq.InventoryMessage;
 import com.nusiss.orderservice.param.SubmitOrderParam;
 import com.nusiss.orderservice.service.OrderService;
 import com.nusiss.orderservice.mapper.OrderMapper;
-import feign.QueryMap;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,7 +79,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
             orderItem.setOrderId(order.getOrderId());
             orderItem.setProductId(cartInfoDTO.getProductId());
             orderItem.setQuantity(cartInfoDTO.getQuantity());
-            orderItem.setPrice(cartInfoDTO.getPrice());
+            orderItem.setPrice(BigDecimal.valueOf(cartInfoDTO.getPrice()));
             orderItem.setCreateUser("jyc");
             orderItem.setUpdateUser("jyc");
             orderItem.setCreateDatetime(new Date());
@@ -117,6 +117,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         // for (OrderItem orderItem : orderItemList) {
         //     inventoryApiClient.deductStock(orderItem.getProductId(),orderItem.getQuantity());
         // }
+
         // 发送消息到RabbitMQ
         List<OrderItem> orderItemList = orderItemMapper.selectList(new QueryWrapper<OrderItem>().eq("order_id", orderId));
         for (OrderItem orderItem : orderItemList) {

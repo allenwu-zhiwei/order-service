@@ -8,16 +8,13 @@ import com.nusiss.orderservice.config.ApiResponse;
 import com.nusiss.orderservice.domain.Order;
 import com.nusiss.orderservice.dto.CartInfoDTO;
 import com.nusiss.orderservice.dto.OrderTradeDTO;
-import com.nusiss.orderservice.dto.UserAddressDTO;
 import com.nusiss.orderservice.param.SubmitOrderParam;
 import com.nusiss.orderservice.service.OrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.amqp.core.Address;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -51,20 +48,19 @@ public class OrderController {
         if(currentUserInfo.getBody()==null){
             user = currentUserInfo.getBody().getData();
         }
-        // 调用用户服务获取用户地址列表
-        ResponseEntity<List<UserAddressDTO>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
-        List<UserAddressDTO> userAddressDTOList = addressesByUserId.getBody();
+        // 调用用户服务获取用户地址列表（前端没写地址，就不要了）
+        ResponseEntity<List<Address>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
+        List<Address> userAddressDTOList = addressesByUserId.getBody();
         // 调用购物车服务获取待下单的商品信息
         List<CartInfoDTO> cartCheckedList= cartApiClient.getCartCheckedList(authToken);
         // 获取订单商品总价格
         BigDecimal totalPrice = new BigDecimal(0);
         for (CartInfoDTO cartInfoDTO : cartCheckedList) {
-            totalPrice = totalPrice.add(cartInfoDTO.getPrice().multiply(new BigDecimal(cartInfoDTO.getQuantity())));
+            totalPrice = totalPrice.add(BigDecimal.valueOf(cartInfoDTO.getPrice()).multiply(new BigDecimal(cartInfoDTO.getQuantity())));
         }
         OrderTradeDTO orderTradeDTO = new OrderTradeDTO();
         orderTradeDTO.setOrderDate(new Date());
         orderTradeDTO.setTotalPrice(totalPrice);
-        orderTradeDTO.setUserAddress(userAddressDTOList);
         orderTradeDTO.setCartInfoList(cartCheckedList);
         return ApiResponse.success(orderTradeDTO);
     }
@@ -73,9 +69,17 @@ public class OrderController {
     // 我的订单，获取我的订单列表
     @GetMapping("/index")
     public ApiResponse<List<Order>> index(HttpServletRequest request) {
-        String userId = request.getHeader("userId");
+        String authToken = request.getHeader("authToken");
+        if(authToken == null){
+            return ApiResponse.error("用户未登录");
+        }
+        ResponseEntity<ApiResponse<User>> currentUserInfo = userApiClient.getCurrentUserInfo(authToken);
+        User user = new User();
+        if(currentUserInfo.getBody()==null){
+            user = currentUserInfo.getBody().getData();
+        }
         // 获取最近十个订单
-        List<Order> orderList=orderService.getOrderByUserId(Long.parseLong(userId));
+        List<Order> orderList=orderService.getOrderByUserId(user.getUserId());
         return ApiResponse.success(orderList);
     }
 
