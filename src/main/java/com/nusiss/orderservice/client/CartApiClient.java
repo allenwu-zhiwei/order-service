@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-@FeignClient("cart-service")
+@FeignClient("shoppingcart-service")
 public interface CartApiClient {
     // 查询购物车中所有被选中的商品
     @GetMapping("/api/v1/cart/selected-items")
