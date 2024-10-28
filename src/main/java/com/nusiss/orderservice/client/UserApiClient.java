@@ -14,8 +14,8 @@ public interface UserApiClient {
     // 获取用户地址
     // @GetMapping("/user/inner/getUserAddress/{userId}")
     // public List<UserAddressDTO> getUserAddress(@PathVariable("userId") Long userId);
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Address>> getAddressesByUserId(@PathVariable("userId") Integer userId);
+    // @GetMapping("/user/{userId}")
+    // public ResponseEntity<List<Address>> getAddressesByUserId(@PathVariable("userId") Integer userId);
 
     // 获取当前用户信息
     @PostMapping("/getCurrentUserInfo")
