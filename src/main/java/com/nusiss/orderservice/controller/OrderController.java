@@ -38,9 +38,8 @@ public class OrderController {
 
     // 去结算，获取结算页信息
     @GetMapping("/trade")
-    public ApiResponse<OrderTradeDTO> getTradeInfo(HttpServletRequest request){
+    public ApiResponse<OrderTradeDTO> getTradeInfo(@RequestHeader("authToken") String authToken){
         // 基于gateway完成了认证添加自定义请求头
-        String authToken = request.getHeader("authToken");
         if(authToken == null){
             return ApiResponse.error("用户未登录");
         }
@@ -69,8 +68,7 @@ public class OrderController {
 
     // 我的订单，获取我的订单列表
     @GetMapping("/index")
-    public ApiResponse<List<Order>> index(HttpServletRequest request) {
-        String authToken = request.getHeader("authToken");
+    public ApiResponse<List<Order>> index(@RequestHeader("authToken") String authToken) {
         if(authToken == null){
             return ApiResponse.error("用户未登录");
         }
@@ -88,48 +86,41 @@ public class OrderController {
 
     // 提交订单
     @PostMapping("/submitOrder")
-    public ApiResponse<Long> submitOrder(@RequestBody SubmitOrderParam submitOrderParam, HttpServletRequest request) {
-        String authToken = request.getHeader("authToken");
-        // 单机调试不用调用其他服务（灵言师，说出口令可跳过逻辑）
-        String isTest = request.getHeader("password");
+    public ApiResponse<Long> submitOrder(@RequestBody SubmitOrderParam submitOrderParam, @RequestHeader("authToken") String authToken) {
         List<CartInfoDTO> cartInfoList = submitOrderParam.getCartInfoList();
-        if(isTest==null||!isTest.equals("danxindehong")) {
-            // 判断库存是否足够
-            for (CartInfoDTO cartInfoDTO : cartInfoList) {
-                Boolean checkStock = inventoryApiClient.checkStock(cartInfoDTO.getProductId(), cartInfoDTO.getQuantity());
-                if (!checkStock) {
-                    return ApiResponse.error("库存不足");
-                }
+        // 判断库存是否足够
+        for (CartInfoDTO cartInfoDTO : cartInfoList) {
+            Boolean checkStock = inventoryApiClient.checkStock(cartInfoDTO.getProductId(), cartInfoDTO.getQuantity());
+            if (!checkStock) {
+                return ApiResponse.error("库存不足");
             }
         }
         Long orderId = orderService.submitOrder(submitOrderParam);
         // 删除购物车中已经下单的商品
-        if(isTest==null||!isTest.equals("danxindehong")){
-            cartApiClient.deleteCartProductsInOrder(authToken);
-        }
+        cartApiClient.deleteCartProductsInOrder(authToken);
         // 发送订单超时自动取消延迟消息（待定，提交订单同时提交支付则无该功能）
         return ApiResponse.success(orderId);
     }
 
-    // 添加订单 测试用
-    @GetMapping("/addOrder")
-    public ApiResponse<Order> addOrder(){
-        Order order = new Order();
-        order.setUserId(1L);
-        order.setOrderDate(new Date());
-        order.setTotalPrice(new BigDecimal(100));
-        order.setStatus("PENDING");
-        order.setCreateUser("jyc");
-        order.setUpdateUser("jyc");
-        order.setCreateDatetime(new Date());
-        order.setUpdateDatetime(new Date());
-        System.out.println(order);
-        int i = orderService.addOrder(order);
-        System.out.println(order);
-        if(i>0){
-            return ApiResponse.success(order);
-        }else{
-            return ApiResponse.error("添加订单失败");
-        }
-    }
+    // // 添加订单 测试用
+    // @GetMapping("/addOrder")
+    // public ApiResponse<Order> addOrder(){
+    //     Order order = new Order();
+    //     order.setUserId(1L);
+    //     order.setOrderDate(new Date());
+    //     order.setTotalPrice(new BigDecimal(100));
+    //     order.setStatus("PENDING");
+    //     order.setCreateUser("jyc");
+    //     order.setUpdateUser("jyc");
+    //     order.setCreateDatetime(new Date());
+    //     order.setUpdateDatetime(new Date());
+    //     System.out.println(order);
+    //     int i = orderService.addOrder(order);
+    //     System.out.println(order);
+    //     if(i>0){
+    //         return ApiResponse.success(order);
+    //     }else{
+    //         return ApiResponse.error("添加订单失败");
+    //     }
+    // }
 }
