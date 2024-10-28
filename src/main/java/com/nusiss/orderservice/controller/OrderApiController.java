@@ -2,9 +2,11 @@ package com.nusiss.orderservice.controller;
 
 import com.nusiss.orderservice.client.InventoryApiClient;
 import com.nusiss.orderservice.config.ApiResponse;
+import com.nusiss.orderservice.domain.Order;
 import com.nusiss.orderservice.service.OrderService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +25,10 @@ public class OrderApiController {
     public ApiResponse paySuccess(Long orderId) {
         orderService.paySuccess(orderId);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/getOrderInfo/{orderId}")
+    Order getOrderById(@PathVariable("orderId") String orderId){
+        return orderService.getById(orderId);
     }
 }
