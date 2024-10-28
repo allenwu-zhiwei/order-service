@@ -47,8 +47,10 @@ public class OrderController {
         }
         ResponseEntity<ApiResponse<User>> currentUserInfo = userApiClient.getCurrentUserInfo(authToken);
         User user = new User();
-        if(currentUserInfo.getBody()==null){
+        if(Objects.requireNonNull(currentUserInfo.getBody()).getData()!=null){
             user = currentUserInfo.getBody().getData();
+        }else {
+            return ApiResponse.error("未查询到用户");
         }
         // 调用用户服务获取用户地址列表（前端没写地址，就不要了）
         // ResponseEntity<List<Address>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
