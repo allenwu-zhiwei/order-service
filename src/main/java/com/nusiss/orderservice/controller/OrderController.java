@@ -41,7 +41,7 @@ public class OrderController {
     public ApiResponse<OrderTradeDTO> getTradeInfo(@RequestHeader("authToken") String authToken){
         // 基于gateway完成了认证添加自定义请求头
         if(authToken == null){
-            return ApiResponse.error("用户未登录");
+            return ApiResponse.error("User haven't login");
         }
         ResponseEntity<ApiResponse<User>> currentUserInfo = userApiClient.getCurrentUserInfo(authToken);
         User user = new User();
@@ -49,7 +49,7 @@ public class OrderController {
             user = currentUserInfo.getBody().getData();
         }
         // 调用用户服务获取用户地址列表（前端没写地址，就不要了）
-        ResponseEntity<List<Address>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
+        // ResponseEntity<List<Address>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
         // List<Address> userAddressDTOList = addressesByUserId.getBody();
         // 调用购物车服务获取待下单的商品信息
         List<CartInfoDTO> cartCheckedList= cartApiClient.getCartCheckedList(authToken);
