@@ -2,8 +2,10 @@ package com.nusiss.orderservice.service;
 
 import com.nusiss.orderservice.domain.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.nusiss.orderservice.dto.CartInfoDTO;
 import com.nusiss.orderservice.param.SubmitOrderParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -17,7 +19,7 @@ public interface OrderService extends IService<Order> {
 
     List<Order> getOrderByUserId(long l);
 
-    Long submitOrder(SubmitOrderParam submitOrderParam);
+    Long submitOrder(Long userId, BigDecimal totalPrice, List<CartInfoDTO> cartInfoList);
 
     void paySuccess(Long orderId);
 }

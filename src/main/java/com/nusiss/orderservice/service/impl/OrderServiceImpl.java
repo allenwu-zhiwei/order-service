@@ -60,12 +60,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     }
 
     @Override
-    public Long submitOrder(SubmitOrderParam submitOrderParam) {
+    public Long submitOrder(Long userId, BigDecimal totalPrice, List<CartInfoDTO> cartInfoList) {
         Order order = new Order();
-        order.setUserId(submitOrderParam.getUserId());
+        order.setUserId(userId);
         order.setOrderDate(new Date());
         order.setStatus("PENDING");
-        order.setTotalPrice(submitOrderParam.getTotalPrice());
+        order.setTotalPrice(totalPrice);
         order.setCreateUser("jyc");
         order.setUpdateUser("jyc");
         order.setCreateDatetime(new Date());
@@ -73,7 +73,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         orderMapper.insert(order);
         System.out.println(order);
         // 对订单里每个商品插入order_item
-        List<CartInfoDTO> cartInfoList = submitOrderParam.getCartInfoList();
         for (CartInfoDTO cartInfoDTO : cartInfoList) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(order.getOrderId());
