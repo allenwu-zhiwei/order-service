@@ -50,7 +50,7 @@ public class OrderController {
         }
         // 调用用户服务获取用户地址列表（前端没写地址，就不要了）
         ResponseEntity<List<Address>> addressesByUserId = userApiClient.getAddressesByUserId(user.getUserId());
-        List<Address> userAddressDTOList = addressesByUserId.getBody();
+        // List<Address> userAddressDTOList = addressesByUserId.getBody();
         // 调用购物车服务获取待下单的商品信息
         List<CartInfoDTO> cartCheckedList= cartApiClient.getCartCheckedList(authToken);
         // 获取订单商品总价格
