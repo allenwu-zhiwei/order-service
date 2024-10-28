@@ -18,6 +18,7 @@ import org.springframework.amqp.core.Address;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author jyc
@@ -75,8 +76,10 @@ public class OrderController {
         }
         ResponseEntity<ApiResponse<User>> currentUserInfo = userApiClient.getCurrentUserInfo(authToken);
         User user = new User();
-        if(currentUserInfo.getBody()!=null){
+        if(Objects.requireNonNull(currentUserInfo.getBody()).getData()!=null){
             user = currentUserInfo.getBody().getData();
+        }else {
+            return ApiResponse.error("未查询到用户");
         }
         // 获取最近十个订单
         List<Order> orderList=orderService.getOrderByUserId(user.getUserId());
