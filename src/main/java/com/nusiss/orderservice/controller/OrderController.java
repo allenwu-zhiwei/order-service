@@ -40,7 +40,7 @@ public class OrderController {
 
     // 去结算，提交订单(前端没有界面，二合一了)
     @GetMapping("/checkout")
-    public ApiResponse<OrderTradeDTO> getTradeInfo(@RequestHeader("authToken") String authToken){
+    public ApiResponse<Long> getTradeInfo(@RequestHeader("authToken") String authToken){
         // 基于gateway完成了认证添加自定义请求头
         if(authToken == null){
             return ApiResponse.error("User haven't login");
@@ -70,8 +70,8 @@ public class OrderController {
         // 删除购物车中已经下单的商品
         cartApiClient.deleteCartProductsInOrder(authToken);
         // 同时提交支付(因为前端没有支付页面)
-        paymentApiClient.submitPayment(orderId.toString());
-        return ApiResponse.success();
+        // paymentApiClient.submitPayment(orderId.toString());
+        return ApiResponse.success(orderId);
     }
 
 
