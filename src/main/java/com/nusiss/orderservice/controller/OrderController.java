@@ -75,7 +75,7 @@ public class OrderController {
         }
         ResponseEntity<ApiResponse<User>> currentUserInfo = userApiClient.getCurrentUserInfo(authToken);
         User user = new User();
-        if(currentUserInfo.getBody()==null){
+        if(currentUserInfo.getBody()!=null){
             user = currentUserInfo.getBody().getData();
         }
         // 获取最近十个订单
